@@ -1,0 +1,76 @@
+load("/Users/Falgreen/Desktop/DoseResponse/data/Absorbance.readDBFData.RData")
+A.data <- old
+load(A.data file = "/Users/Falgreen/Desktop/DoseResponse/data/Absorbance.readDBFData.RData")
+load(A.data, file = "/Users/Falgreen/Desktop/DoseResponse/data/Absorbance.readDBFData.RData")
+save(A.data, file = "/Users/Falgreen/Desktop/DoseResponse/data/Absorbance.readDBFData.RData")
+Absorbance.readDBFData <- old
+save(Absorbance.readDBFData, file = "/Users/Falgreen/Desktop/DoseResponse/data/Absorbance.readDBFData.RData")
+require(Hmisc)
+load("/Users/Falgreen/Desktop/DoseResponse/data/Absorbance.readDBFData.RData")
+ls()
+A.data <- Absorbance.readDBFData
+save("/Users/Falgreen/Desktop/DoseResponse/data/A.data.RData")
+save(A.data , file = "/Users/Falgreen/Desktop/DoseResponse/data/A.data.RData")
+require(DoseResponse)#
+data(A.data)#
+A.data <- #
+      drugColorCorrection(A.data = A.data, #
+                          progressbar = "text", save = FALSE)#
+#
+## Plot of the drug specific Absorbance measures with an 95\% confidence interval.#
+plotdrugColorCorrection(A.data=Absorbance.readDBFData, type.plot = c("output"))#
+#
+## Plot of the absorbance values. Use this plot for dagnostics of each dose response #
+## experiment. Plates that are not fitted adequately should be removed a plate is found #
+par(mfrow = c(2,3))#
+plotdrugColorCorrection(A.data=A.data, #
+                        drugs = "Doxorubicin",#
+                        set.par=FALSE,#
+                        type.plot = c("raw"))#
+plotdrugColorCorrection(A.data=A.data, #
+                        drugs = "Rituximab",#
+                        set.par=FALSE,#
+                        type.plot = c("raw"))
+data(A.data)#
+A.data <- #
+      drugColorCorrection(A.data = A.data, #
+                          progressbar = "text", save = FALSE)#
+#
+## Plot of the drug specific Absorbance measures with an 95\% confidence interval.#
+plotdrugColorCorrection(A.data=A.data, type.plot = c("output"))#
+#
+## Plot of the absorbance values. Use this plot for dagnostics of each dose response #
+## experiment. Plates that are not fitted adequately should be removed a plate is found #
+par(mfrow = c(2,3))#
+plotdrugColorCorrection(A.data=A.data, #
+                        drugs = "Doxorubicin",#
+                        set.par=FALSE,#
+                        type.plot = c("raw"))#
+plotdrugColorCorrection(A.data=A.data, #
+                        drugs = "Rituximab",#
+                        set.par=FALSE,#
+                        type.plot = c("raw"))
+require(DoseResponse)#
+data(A.data)#
+A.data <- #
+      drugColorCorrection(A.data = A.data, #
+                          progressbar = "text", save = FALSE)#
+#
+## Plot of the drug specific Absorbance measures with an 95\% confidence interval.#
+plotdrugColorCorrection(A.data=A.data, type.plot = c("output"))#
+#
+## Plot of the absorbance values. Use this plot for dagnostics of each dose response #
+## experiment. Plates that are not fitted adequately should be removed a plate is found #
+par(mfrow = c(2,3))#
+plotdrugColorCorrection(A.data=A.data, #
+                        drugs = "Doxorubicin",#
+                        set.par=FALSE,#
+                        type.plot = c("raw"))#
+plotdrugColorCorrection(A.data=A.data, #
+                        drugs = "Rituximab",#
+                        set.par=FALSE,#
+                        type.plot = c("raw"))
+load("/Users/Falgreen/Documents/PhD Study/Analysis/Study II - DoseR/DoseR/data/A.data.RData")
+A.data
+save(A.data, file = "/Users/Falgreen/Documents/PhD Study/Analysis/Study II - DoseR/DoseR/data/A.data.RData")
+load("/Users/Falgreen/Documents/PhD Study/Analysis/Study II - DoseR/DoseR/data/A.data.RData")

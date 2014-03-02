@@ -1,0 +1,20 @@
+citHeader("To cite DoseResponse in publications use:")
+
+citEntry(entry = "Article",
+  title        = "{DoseResponse}: An {R} Package for Analyzing Dose Response Experiments Independent of Time",
+  author       = personList(as.person("Steffen Falgreen"),
+                   as.person("Martin Boegsted")),
+  journal      = "Journal of Statistical Software",
+  year         = "2014",
+  volume       = "..",
+  number       = "..",
+  pages        = "..",
+  url          = "..",
+
+  textVersion  =
+  paste("Steffen Falgreen, Martin Boegsted (2014).",
+        "DoseResponse: An R Package for Analyzing Dose Response Experiments Independent of Time.",
+        "Journal of Statistical Software,",
+        "URL http://www.jstatsoft.org/../.")
+)
+

@@ -1,0 +1,74 @@
+#exportPattern("^[[:alpha:]]+")
+#import(foreign,plyr,WriteXLS,nlme,tcltk,pracma,RColorBrewer,Hmisc)
+
+#import(foreign,WriteXLS,nlme,Hmisc,tcltk,pracma,RColorBrewer, gdata)
+
+#plyr
+
+#importFrom(prada, plotPlate)
+#importFrom(gdata, sheetNames)
+#importFrom(gdata, sheetCount)
+#importFrom(gdata, xls2sep)
+# pracma trapz
+#importFrom(RJSONIO, fromJSON)
+#importFrom(XML,    readHTMLTable)
+#importFrom(RCurl, getForm)
+import(foreign, gdata, plyr, WriteXLS, nlme, tcltk,  RJSONIO, 
+       RCurl, XML, RColorBrewer,shiny,shinyIncubator)
+# GPL(>=3,   GPL-2 | GPL-3, GPL-2, MIT, GPL-2, GPL-2 | GPL-3, LGPL-3, BSD, BSD, BSD, APACHE)
+importFrom(Hmisc, latex)
+importFrom(animation,im.convert)
+importFrom(tools,texi2dvi)
+#importFrom(prada, plotPlate)
+#import(WriteXLS)
+
+## main functions
+export("createMetaData")
+export("readDBFData")
+export("drugColorCorrection")
+export("bgModel")
+export("bootstrap")
+export("doseResponseModel")
+export("changeMolarMass")
+export("CI")
+export("CI.summary.DRdata")
+export("pdfCI")
+export("tableCI")
+
+
+
+export("plotbgModelresid")
+export("plotdrugColorCorrection")
+export("plotbgModel")
+export("plot.DRdata")
+export("DRdataBoxplot")
+export("plot.growthModel")
+export("plotGrid")
+
+
+export("print.createMetaData")
+export("print.Absorbance")
+export("print.drugColorCorrection")
+export("print.bgModel")
+export("print.bootstrap")
+export("print.summary.DRdata")
+export("print.doseResponseModel")
+
+export("createProtocol")
+export("editDBFProtocol")
+export("editProtocol")
+export("readProtocol")
+export("useExistingProtocol")
+export("useNewProtocol")
+export("useTempProtocol")
+
+export("runDoseR")
+
+export("readDBFDataShiny")
+export("drugColorCorrectionShiny")
+export("bgModelShiny")
+export("bootstrapShiny")
+export("doseResponseModelShiny")
+
+export("DeltaCI")
+export("DeltaPlot")

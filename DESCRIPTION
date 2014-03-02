@@ -1,0 +1,10 @@
+Package: DoseR
+Type: Package
+Title: Analysis of dose response experiments
+Version: 0.1
+Date: 2013-10-21
+Author: Steffen Falgreen Larsen
+Maintainer: Steffen Falgreen Larsen <sfl@rn.dk>
+Description: R package for analysing dose response experiments.
+License: GPL (>=2)
+Depends: foreign, plyr, gdata, WriteXLS, nlme, tcltk, RJSONIO, RCurl, XML, Hmisc, tools, animation, RColorBrewer, shiny, shinyIncubator

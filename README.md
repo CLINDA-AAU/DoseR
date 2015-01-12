@@ -1,4 +1,4 @@
-hemaClass: Classification tool for haematological diseases. 
+DoseR: Dose response analysis in R using the time independent G-model. 
 =================================
 
 The R-package `DoseR` is a set of tools used for dose response analysis.
@@ -49,7 +49,7 @@ devtools::install_github("Falgreen/DoseR",
 modifications!
 
 
-Using hemaClass
+Using DoseR
 ----------
 A small tutorial goes here!
 
@@ -57,9 +57,6 @@ A small tutorial goes here!
 The supplied expression matrices to be converted are arrange in the tall 
 configuration. I.e. we have features in the rows and samples in columns.
 
-Benchmark 
----------
-A small bencmark goes here!
 
 References
 ----------

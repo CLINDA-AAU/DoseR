@@ -214,14 +214,22 @@ drugInfo <- function(drug){
   theurl <- paste("http://en.wikipedia.org/wiki/", ex[[2]][1], sep= "")
   table <- readHTMLTable(theurl)[[1]]
   
-  rownames(table) <- table[,1]
-  table[,1] <- as.character(table[,1])
-  table[,2] <- as.character(table[,2])
-
-  table[,2] <- gsub("????\u0080\u0093", "-", table[,2])
-  table[,2] <- gsub("????\u0084\u009e", "Rx", table[,2])
-
+ 
   if(!is.null(table)){
+    
+    #flyttet dette {
+    for(i in 1:ncol(table))
+      table[,i] <- as.character(table[,i])
+    
+    table <- table[table[,1] != "", ]
+    rownames(table) <- table[,1]
+    table[,1] <- as.character(table[,1])
+    table[,2] <- as.character(table[,2])
+    
+    table[,2] <- gsub("????\u0080\u0093", "-", table[,2])
+    table[,2] <- gsub("????\u0084\u009e", "Rx", table[,2])
+    # } og hertil, ind i if sentenc
+    
     chem.info <- list()
     
     if(any(grepl("IUPAC", table[,1]))){
@@ -2023,8 +2031,9 @@ A0T1fun <- function(X, timevar = NULL, control, entity, BC = "BC", dataset = "bs
       xx[[paste(times)]][paste("A0T", times, bs.names, sep = "")]
   }
   data2 <- xx[[1]]
-  for(i in 2:length(xx))
-    data2 <- rbind(data2, xx[[i]])
+  if(length(xx) > 1 )
+    for(i in 2:length(xx))
+      data2 <- rbind(data2, xx[[i]])
   X$data$GI.mean <- data2[rownames(data),]
   return(X)
 }
@@ -2063,6 +2072,7 @@ AC0fun <- function(X, timevar = NULL, control, entity, BC = "BC"){
 
 
 doublingTime <- function(X, timevar = "time", control = "X1",
+                         use.supplied.T0 = FALSE, doublingvar = "supT0",
                          entity = "entity", namevar = "name", BC = "BC"){
   
   if("bootstrap" %in% class(X)){
@@ -2081,27 +2091,41 @@ doublingTime <- function(X, timevar = "time", control = "X1",
   }
   
   call <- as.list(X$auxiliary$passed.var)
-  
-  for(bs.iter in bs.names){
-    xx1 <- data[data[, timevar] ==  min(data[, timevar])&
-                  data[, "new.type"] == control,][,
-                                                  c(namevar, entity, bs.iter)]
-    
-    xx2 <- data[data[, timevar] == max(data[, timevar]) &
-                  data[, "new.type"] == control,][,
-                                                  c(namevar, entity, bs.iter)]
-    
-    xx1 <- xx1[order(xx1[, entity]), ]
-    xx2 <- xx2[order(xx2[, entity]), ]
-    
-    dob         <- merge(xx1, xx2, by =c(entity, namevar))
-    dob$T0      <- (max(data[, timevar])- min(data[, timevar])) / log2(dob[,paste(bs.iter, ".y", sep = "")]/
-                                                                         dob[,paste(bs.iter, ".x", sep = "")])
-    formula <- as.formula(paste("T0 ~ ", namevar))
-    T0 <- aggregate(formula, data = dob, FUN = median) #skiftet tilformula
-    
-    rownames(T0) <- T0[,namevar]
-    X$data$GI.mean[,paste("T0", bs.iter, sep = "")] <- T0[X$data$GI.mean[,namevar], "T0"]
+  if(min(data[, timevar]) == max(data[, timevar]))
+    use.supplied.T0 <- TRUE
+  if(!use.supplied.T0){
+    for(bs.iter in bs.names){
+      xx1 <- data[data[, timevar] ==  min(data[, timevar])&
+                    data[, "new.type"] == control,][,
+                                                    c(namevar, entity, bs.iter)]
+      
+      xx2 <- data[data[, timevar] == max(data[, timevar]) &
+                    data[, "new.type"] == control,][,
+                                                    c(namevar, entity, bs.iter)]
+      
+      xx1 <- xx1[order(xx1[, entity]), ]
+      xx2 <- xx2[order(xx2[, entity]), ]
+      
+      dob         <- merge(xx1, xx2, by =c(entity, namevar))
+      dob$T0      <- (max(data[, timevar])- min(data[, timevar])) / log2(dob[,paste(bs.iter, ".y", sep = "")]/
+                                                                           dob[,paste(bs.iter, ".x", sep = "")])
+      formula <- as.formula(paste("T0 ~ ", namevar))
+      T0 <- aggregate(formula, data = dob, FUN = median) #skiftet tilformula
+      
+      rownames(T0) <- T0[,namevar]
+      X$data$GI.mean[,paste("T0", bs.iter, sep = "")] <- T0[X$data$GI.mean[,namevar], "T0"]
+    }
+  }else{
+    for(bs.iter in bs.names){
+      if(doublingvar %in% colnames(X$meta.list$additional)){
+        T0 <- X$meta.list$additional#[, doublingvar] #skiftet tilformula
+        
+        #rownames(T0) <- T0[,namevar]
+        X$data$GI.mean[,paste("T0", bs.iter, sep = "")] <- T0[X$data$GI.mean[,namevar], doublingvar]
+      }else{
+        X$data$GI.mean[,paste("T0", bs.iter, sep = "")] <- NA
+      }
+    }
   }
   return(X)
 }
@@ -2327,7 +2351,7 @@ AUCcalc <- function (x, y) {
 }
 
 
-findAUCq <- function(x, y, q = 0){
+findAUCq <- function(x, y, q = 0, lim = NULL){
   
   auc.q <- findGI(x, y, q)
   
@@ -2335,9 +2359,56 @@ findAUCq <- function(x, y, q = 0){
   
   y2 <- c(y[x< auc.q] - q, 0)
   
+  if(!is.null(lim) && !all(range(x) == lim)){
+    new <- restictDoses(x=x2, y=y2, lim)
+    x2 <- new$x
+    y2 <- new$y
+  }
+  
   AUCcalc(x2, y2)
 }
 
+restictDoses <- function(x, y, lim = NULL){
+  x.min <- min(lim, na.rm = TRUE)
+  x.max <- max(lim, na.rm = TRUE)
+  
+  if(min(x, na.rm = TRUE) == x.min)
+    y.min <- y[x == x.min]
+  
+  if(min(x, na.rm = TRUE) < x.min)
+    if(any(x.min == x)){
+      y.min <- y[x == x.min]
+    }else{
+      x1 <- max(x[x< x.min])
+      x2 <- min(x[x > x.min])
+      y1 <- y[x == x1]
+      y2 <- y[x == x2]
+      y.min <- (y2 - y1) / (x2 - x1) * (x.min - x1) + y1
+      
+    }
+  
+  if(max(x, na.rm = TRUE) == x.max)
+    y.max <- y[x == x.max]
+  
+  if(max(x, na.rm = TRUE) < x.max)
+    y.max <- y[x == max(x, na.rm = TRUE)]
+  
+  if(max(x, na.rm = TRUE) > x.max)
+    if(any(x.max == x)){
+      y.max <- y[x == x.max]
+    }else{
+      x1 <- max(x[x< x.max])
+      x2 <- min(x[x > x.max])
+      y1 <- y[x == x1]
+      y2 <- y[x == x2]
+      y.max <- (y2 - y1) / (x2 - x1) * (x.max - x1) + y1
+    }
+  
+  x.new <- c(x.min, x[x > x.min & x < x.max], x.max)
+  y.new <- c(y.min, y[x > x.min & x < x.max], y.max) 
+  
+  return(list(x = x.new, y = y.new))
+}
 
 
 BGfunction <- function(A, B = NULL, type = NULL,
@@ -2754,7 +2825,7 @@ growth.function <- function(data, cut = 0.025,
     fit.Bcut <- lm(log(temp[temp$type == content, "Bcut"]) ~
                      temp[temp$type == content, "t"])
     
-    tc.mat[content, "st.TC"] <- 1/coef(fit.Bcut)[2]
+    tc.mat[content, "st.TC"] <- 1 / coef(fit.Bcut)[2]
     
   }
   

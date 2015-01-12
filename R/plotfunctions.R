@@ -1,4 +1,6 @@
 
+"%w/o%" <- function(x, y) x[!x %in% y] #--  x without y
+
 plotbgModelresid <- function(A.data,
                               names = NULL,
                               times = NULL,
@@ -646,7 +648,7 @@ plot.growthModel <- function(x,
       
       
       if(!is.null(sum)){
-        
+        sum  <- sum[order(sum[, dosevar]),]
         data <- data.drug[data.drug[, namevar] == name.iter & 
                             data.drug[, additivevar] != back, ]
         
@@ -1346,13 +1348,13 @@ plot.DRdata <-
           iso.fit[,timevar] %in% times & 
           iso.fit[, namevar] %in% cells
         
-        twoscale <- min(iso.fit[wh.x, wh.range]) < 0
+        twoscale <- min(iso.fit[wh.x, wh.range], na.rm = TRUE) < 0
         if(is.null(ylim)){
-          maxGup <- max(iso.fit[wh.x, wh.range])
+          maxGup <- max(iso.fit[wh.x, wh.range], na.rm = TRUE)
           if(twoscale){
             ylim <- c(-maxGup, maxGup)
           }else{
-            ylim <- range(iso.fit[, wh.range])
+            ylim <- range(iso.fit[, wh.range], na.rm = TRUE)
           }    
         }else{
           y.min <- min(ylim)
@@ -1371,10 +1373,10 @@ plot.DRdata <-
         
         twoscale <- FALSE
         if(is.null(ylim)) 
-          ylim <- range(iso.fit[wh.x, wh.range])
+          ylim <- range(iso.fit[wh.x, wh.range], na.rm = TRUE)
       }
       
-      if(is.null(xlim)) xlim <- range(data.drug[, "conc.m"])
+      if(is.null(xlim)) xlim <- range(data.drug[, "conc.m"], na.rm = TRUE)
       wh <-  paste(model, "iso", sep = ".")
       #########################################################
       ##
@@ -1406,6 +1408,7 @@ plot.DRdata <-
                 1,, drop = FALSE]), time = time.iter))
           data.c <- as.data.frame(data.c)
           data.c$name <- row.names(data.c)
+          colnames(data.c)[colnames(data.c) == "name"] <- namevar
           row.names(data.c) <- 1:nrow(data.c)
           data.c <- data.c[data.c[, "time"] %in% times &
                              data.c[, namevar] %in% cells,]
@@ -1415,7 +1418,7 @@ plot.DRdata <-
           
           
           data.c <- reshape(data.c, idvar=namevar, direction="wide")
-          row.names(data.c) <- data.c$name
+          row.names(data.c) <- data.c[,namevar]
           data.c <- data.c[,-1, drop =FALSE]
           data.c <- apply(data.c, 1, mean)
           data <- data.c[order(data.c)]
@@ -1607,10 +1610,11 @@ plot.DRdata <-
       ##
       #########################################################
       
-      plot(0,0,xlim, ylim,col = 0,
+      plot(0,0,xlim, ylim, col = 0,
               type = "n",
               ylab = ylab,
               xlab = xlab,
+          # log = "x",
               ...,
               main = main,
               las = 1,
@@ -1629,10 +1633,10 @@ plot.DRdata <-
       ##
       ########################################
       normalized   <- function(x, scale = 1) 
-        ((x- min(x)) / (max(x)-min(x))) * scale
+        ((x- min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE)-min(x, na.rm = TRUE))) * scale
       normalizeToX <- function(x, y, scale = 1) 
-        ((y- min(x)) / (max(x)-min(x)))*scale
-      
+        ((y- min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE)-min(x, na.rm = TRUE)))*scale
+      y.norm <- c(0, max(ylim))
       if(twoscale){
         y.norm <- c(0, max(ylim))
         #ylim <<- ylim
@@ -1643,7 +1647,7 @@ plot.DRdata <-
         
         y.norm <- data.drug[data.drug[, namevar] %in% cells, wh.range]
        
-        if(is.null(y.min)) y.min <- min(y.norm)
+        if(is.null(y.min)) y.min <- min(y.norm, na.rm = TRUE)
         
         y.norm <- c(y.min, 0)
         
@@ -1706,8 +1710,8 @@ plot.DRdata <-
         int <- intersect(cells, names2)
         names2 <- names2[names2 %in% int]
         
-        
-        for(name.iter in names2[names2 %in% unique(data.time[,namevar])]) {
+        names3 <- colnames(data)[!is.na(data)]
+        for(name.iter in names2[names2 %in% intersect(unique(data.time[, namevar]), names3)]) {
           
           iter <- iter + 1
           
@@ -1717,6 +1721,7 @@ plot.DRdata <-
           y <-  data.time[data.time[,namevar] == name.iter &
                             data.time[, "data"] == "BC",  wh]
           
+          if(any(!is.na(y))){
           if(grepl("G", model))
             y[y<0] <- -1*(normalizeToX(y.norm, y[y < 0], 
                                        scale = -max(ylim))+max(ylim))
@@ -1741,7 +1746,7 @@ plot.DRdata <-
           
           legend.order <- 
             rbind( legend.order, c(time.iter, name.iter, 
-                                   col[iter], lty=lty[iter], pch=lty[iter]))
+                                   col[iter], lty=lty[iter], pch=lty[iter]))}
         } # name.iter
       } # time.iter
     }
@@ -1973,7 +1978,52 @@ DRdataBoxplot <- function(A.data, splitvar =NULL, #split = "all",
   invisible()
 }
 
- 
+# A.data = A.data
+# model  = "G"
+# type   = "AUC"
+# times  = NULL
+# dose.scale   = "mol/l"
+# dose.logfun  = "log10"
+# drug   = 1
+# name   = 2
+# names  = NULL
+# plot.order = NULL
+# conc.names = NULL
+# ylim   = NULL
+# xlim   = NULL
+# nrows  = NULL
+# ncols  = NULL
+# ylab   = NULL
+# xlab   = NULL
+# #scale  = TRUE
+# main   = paste("Dose Response Curves for", drug)
+# absorbance.CI       = FALSE
+# absorbance.CI.col   = "#C6C6C5"
+# absorbance.CI.alpha = 80
+# bootstrap.conf = TRUE
+# barcol         = "#71965A"
+# bar.height     = 1.3
+# plotgrid = TRUE
+# grid.col = "#C6C6C5"
+# grid.lty = 1
+# grid.lwd = 1
+# bs.col   = c("#333333", "#9D2441")
+# bs.lty   = 1
+# bs.lwd   = 0.5
+# bs.alpha = 50 
+# line.col = c("#333333", "#9D2441")
+# line.lty = rep(1, 8)
+# line.lwd = rep(1,8)
+# line.alpha = ""                 
+# col.by.identifier = TRUE
+# col.points = c("#333333", "#9D2441")
+# pch = 1
+# plot.data = FALSE
+# log        = ""
+# pdfit      = FALSE
+# pdf.width  = 6.6929 
+# pdf.height = 6.6929
+# pointsize  = 8
 
 plotGrid <- function(A.data = A.data,
                      model  = "G",
@@ -2079,6 +2129,7 @@ plotGrid <- function(A.data = A.data,
   if(is.null(times))
     times <- sort(unique(data.drug[, timevar])) 
   
+ 
   cells <- unique(data.drug[, namevar])
   if(!is.null(names))
     cells <- cells[cells %in% names]
@@ -2169,6 +2220,8 @@ plotGrid <- function(A.data = A.data,
             1,, drop = FALSE]), time = time.iter))
       data.c <- as.data.frame(data.c)
       data.c$name <- row.names(data.c)
+      colnames(data.c)[colnames(data.c) == "name"]  <- namevar
+     
       row.names(data.c) <- 1:nrow(data.c)
       data.c <- data.c[data.c[, "time"] %in% times &
                          data.c[, namevar] %in% cells,]
@@ -2177,8 +2230,8 @@ plotGrid <- function(A.data = A.data,
       col.sc[, type] <-  data.c[, "BC"]
       
       
-      data.c <- reshape(data.c, idvar=namevar, direction="wide")
-      row.names(data.c) <- data.c$name
+      data.c <- reshape(data.c, idvar = namevar, direction="wide")
+      row.names(data.c) <- data.c[, namevar]
       data.c <- data.c[,-1, drop =FALSE]
       data.c <- apply(data.c, 1, mean)
       data <- data.c[order(data.c)]
@@ -2305,7 +2358,7 @@ plotGrid <- function(A.data = A.data,
     
     y.norm <- data.drug[data.drug[, namevar] %in% cells, wh.range]
 
-    if(is.null(y.min)) y.min <- min(y.norm)
+    if(is.null(y.min)) y.min <- min(y.norm, na.rm = TRUE)
     
     y.norm <- c( y.min, 0)
     
@@ -2332,6 +2385,9 @@ plotGrid <- function(A.data = A.data,
   
   data <- A.data$summary[[drug]][[model]][[type]]
   
+  
+  if(!exists("time.iter") || is.null(time.iter))
+    time.iter <- names(data)[1]
   if(model != "G")
     data    <- data[[paste(time.iter)]]
   
@@ -2473,16 +2529,17 @@ plotGrid <- function(A.data = A.data,
             y <-  data.time[data.time[,namevar.orig] == name.iter2 & 
                               data.time[, "data"] == bs.iter,  wh]
             
-            if(grepl("G", model))
-              y[y<0] <- -1*(normalizeToX(y.norm, y[y < 0], 
-                                         scale = -max(ylim))+max(ylim))
-            
-            
-            lines(x, y, type = "l", 
-                  lty = bs.lty[iter], 
-                  col = paste(bs.col[iter], bs.alpha, sep = ""), 
-                  lwd = bs.lwd[iter])
-            
+            if(any(!is.na(y))){
+              if(grepl("G", model))
+                y[y<0] <- -1*(normalizeToX(y.norm, y[y < 0], 
+                                           scale = -max(ylim))+max(ylim))
+              
+              
+              lines(x, y, type = "l", 
+                    lty = bs.lty[iter], 
+                    col = paste(bs.col[iter], bs.alpha, sep = ""), 
+                    lwd = bs.lwd[iter])
+            }
           }
         }
       }
@@ -2513,26 +2570,28 @@ plotGrid <- function(A.data = A.data,
         y <-  data.time[data.time[,namevar.orig] == name.iter2 & 
                           data.time[, "data"] == "BC",  wh]
         
-        if(grepl("G", model))
-          y[y<0] <- -1*(normalizeToX(y.norm, y[y < 0], 
-                                     scale = -max(ylim))+max(ylim))
-        
-        
-        lines(x, y, col = line.col[iter], lty=line.lty[iter])
-        
-        if(plot.data){    
-          
-          y <-  data.time[data.time[,namevar.orig] == name.iter2 &
-                            data.time[, "data"] == "BC"&
-                            data.time[,"origin"] != "at",  wh.range]
-          
-          x <-  data.time[data.time[, namevar.orig] == name.iter2 &
-                            data.time[, "data"] == "BC"&
-                            data.time[,"origin"] != "at" , "conc.m"]
+        if(any(!is.na(y))){
           if(grepl("G", model))
             y[y<0] <- -1*(normalizeToX(y.norm, y[y < 0], 
                                        scale = -max(ylim))+max(ylim))
-          points(x,  y, col = col.points[iter], pch=pch[iter])
+          
+          
+          lines(x, y, col = line.col[iter], lty=line.lty[iter])
+          
+          if(plot.data){    
+            
+            y <-  data.time[data.time[,namevar.orig] == name.iter2 &
+                              data.time[, "data"] == "BC"&
+                              data.time[,"origin"] != "at",  wh.range]
+            
+            x <-  data.time[data.time[, namevar.orig] == name.iter2 &
+                              data.time[, "data"] == "BC"&
+                              data.time[,"origin"] != "at" , "conc.m"]
+            if(grepl("G", model))
+              y[y<0] <- -1*(normalizeToX(y.norm, y[y < 0], 
+                                         scale = -max(ylim))+max(ylim))
+            points(x,  y, col = col.points[iter], pch=pch[iter])
+          }
         }
       }
     } # name.iter

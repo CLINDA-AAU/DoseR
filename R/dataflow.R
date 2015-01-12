@@ -1021,15 +1021,16 @@ readDBFData <- function(
   if(!prior){
     info <- list()
     for(drug.iter in unique(data[, drugvar]))
-      info[[drug.iter]] <- drugInfo(drug.iter)
+      info[[drug.iter]] <- DoseR:::drugInfo(drug.iter)
     
     mol.data <- data.frame(drug = "drug", mol.mass = "mol.mass", stringsAsFactors=FALSE)
     for(drug.iter in names(info))
-      mol.data[drug.iter, ] <- 
+      if(any(info[[drug.iter]] != "Drug not found"))
+        mol.data[drug.iter, ] <- 
       c(drug.iter, info[[drug.iter]]$"Chemical data"["Mol. mass", ])
     
     mol.data <- mol.data[-1,]
-       
+    
   }else{
     mol.data <- old$auxiliary$mol.data
     remove <- names(info) %w/o% unique(data[, drugvar])
@@ -1040,7 +1041,8 @@ readDBFData <- function(
     
     for(drug.iter in (unique(data[, drugvar]) %w/o% names(info))){
       info[[drug.iter]] <- drugInfo(drug.iter)
-      mol.data[drug.iter, ] <- 
+      if(any(info[[drug.iter]] != "Drug not found"))
+        mol.data[drug.iter, ] <- 
         c(drug.iter, info[[drug.iter]]$"Chemical data"["Mol. mass", ])
     }
     
@@ -2599,11 +2601,14 @@ growthModel <- function(A.data,
 ## Function for calculating the measures based on the old growth models
 
 createGIData <- function(A.data, update = TRUE, cut = 0.025,
+                         use.supplied.T0 = FALSE,
                          doublingvar = "supT0",
                          model  = c("R", "D", "RG", "DG"),
                          progressbar = "text",
                          save = TRUE,
                          shiny.input = NULL){
+  
+  
   
   if(update == FALSE)
     A.data$data$GI.mean <- NULL
@@ -2745,8 +2750,10 @@ createGIData <- function(A.data, update = TRUE, cut = 0.025,
                                                "% done"),
                        window = progressbar == "window")
       
-      X <- doublingTime(X,  timevar = timevar, namevar = namevar,
+      X <- doublingTime(X,  timevar = timevar, namevar = namevar, 
+                        use.supplied.T0 = use.supplied.T0, doublingvar = doublingvar,
                         control = control, entity = "entity",  BC = BC)
+      
       
       count <- count + 1
       if(!progressbar == "none")
@@ -2762,6 +2769,7 @@ createGIData <- function(A.data, update = TRUE, cut = 0.025,
         setProgressBar(pb, count, label=paste( round(count/max*100, 2),
                                                "% done"),
                        window = progressbar == "window")
+      
       
       if("R" %in% model | "RG" %in% model ){
         X <- RGrowth(X = X, BC = BC, update = update, n.samples = n.samples,
@@ -2786,6 +2794,7 @@ createGIData <- function(A.data, update = TRUE, cut = 0.025,
                                                  "% done"),
                          window = progressbar == "window")
       }
+      
       if(prior)
         A.data$data$GI.mean <- rbind(GI.mean, X$data$GI.mean)
       if(!prior)
@@ -2842,6 +2851,7 @@ combineGIdata <- function(A.data, save = TRUE){
   
   ##################################################################
   
+  if(!is.null(A.data$data$GI.mean) & !is.null(A.data$data$GM.mean)){
   xx <- intersect(names(A.data$data$GI.mean), names(A.data$data$GM.mean)) %w/o% 
     c(namevar, drugvar, timevar, dosevar)
   xx <- colnames(A.data$data$GM.mean) %w/o% xx
@@ -2849,6 +2859,12 @@ combineGIdata <- function(A.data, save = TRUE){
   A.data$data$DR.data <- merge(A.data$data$GI.mean, A.data$data$GM.mean[, xx],
                                by = c(namevar, drugvar, timevar, dosevar))
   
+  }else{
+    if(!is.null(A.data$data$GI.mean))
+      A.data$data$DR.data <- A.data$data$GI.mean
+    if(!is.null(A.data$data$GM.mean))
+      A.data$data$DR.data <- A.data$data$GM.mean
+  }
   A.data$call$combineGIdata <- this.call
   A.data$call$record <- callNumbering("combineGIdata", A.data$call$record)
   
@@ -3040,9 +3056,14 @@ isoreg.DRdata <-
               }else{                   
                 y.l <-  data.time[data.time[, namevar] == name.iter,
                                   paste(m, "lower", bs.iter, sep = ".")]
-                y.h <-  data.time[data.time[,namevar] == name.iter,
-                                  paste(m, "upper", bs.iter, sep = ".")] 
-                data.line <- findOneLine(x, upper= y.h, lower = y.l)
+                y.h <-  data.time[data.time[, namevar] == name.iter,
+                                  paste(m, "upper", bs.iter, sep = ".")]
+                if(!all(is.na(y.l)) & !all(is.na(y.h))){
+                  data.line <- findOneLine(x, upper= y.h, lower = y.l)
+                }else{
+                  data.line <- data.frame(x = x, fitted = NA, orig = NA, which = NA)
+                    data.line <- data.line[order(data.line$x), c("x", "fitted", "orig", "which")]
+                }
               }
               
               colnames(data.line) <- c(dosevar, paste(m, "iso", sep = "."), 
@@ -3101,7 +3122,7 @@ doseResponseModel <- function(
   ){
   
   if(!any(models != "G"))
-    models <- c(models, "R")
+    models <- unique(c(models, "R"))
   if("G" %in% models){
     if(verbose| progressbar == "text")
       cat("Calculating the G-model \n\n")
@@ -3152,6 +3173,7 @@ doseResponseModel <- function(
   A.data <- do.call(summary.DRdata,
                     list(A.data = quote(A.data),
                          t = eval(t), 
+                         AUC.q  = eval(AUC.q),
                          type.fit= "iso",
                          dose.scale = eval(dose.scale), 
                          dose.logfun= eval(dose.logfun.to ),
@@ -3322,8 +3344,8 @@ summary.DRdata <-
         
         iso.fit <- A.data$data$iso.fits[[drug.iter]][[m]]
         
-        iso.fit <- iso.fit[iso.fit[, dosevar] >= range[1] &
-                             iso.fit[, dosevar] <= range[2]  ,]
+        #iso.fit <- iso.fit[iso.fit[, dosevar] >= range[1] &
+        #                     iso.fit[, dosevar] <= range[2]  ,]
         
         mol <- A.data$auxiliary$mol.data[drug.iter, "mol.mass"]
         
@@ -3383,20 +3405,22 @@ summary.DRdata <-
               if(AUC.q == "TGI")
                 AUC.q2 <- GIov["TGI", m]
               
-              GI50[bs.iter, name.iter] <- 
-                findGI(x, y, GIov["GI50", m]) # try
-              TGI[bs.iter, name.iter] <- 
-                findGI(x, y, GIov["TGI",  m])  # try
-              LC50[bs.iter, name.iter] <- 
-                findGI(x, y, GIov["LC50", m]) # try
-              AUC[bs.iter, name.iter] <- findAUCq(x, y, q = 0)                      
+              if(!all(is.na(y))){
+                GI50[bs.iter, name.iter] <- 
+                  findGI(x, y, GIov["GI50", m]) # try
+                TGI[bs.iter, name.iter] <- 
+                  findGI(x, y, GIov["TGI",  m])  # try
+                LC50[bs.iter, name.iter] <- 
+                  findGI(x, y, GIov["LC50", m]) # try
+                AUC[bs.iter, name.iter] <- findAUCq(x, y, q = AUC.q2, lim = range)  
+              }                    
             }
           }
           if(m == "G"){
             summary[[drug.iter]][[m]]$GI50 <- GI50
-            summary[[drug.iter]][[m]]$TGI <- TGI
+            summary[[drug.iter]][[m]]$TGI  <- TGI
             summary[[drug.iter]][[m]]$LC50 <- LC50
-            summary[[drug.iter]][[m]]$AUC <- AUC
+            summary[[drug.iter]][[m]]$AUC  <- AUC
           }else{
             summary[[drug.iter]][[m]][["GI50"]][[paste(time.iter)]] <- GI50
             summary[[drug.iter]][[m]][["TGI"]][[paste(time.iter)]]  <- TGI
@@ -3452,15 +3476,18 @@ CI.summary.DRdata <- function(A.data,..., model = "G",
   
   for(drug in names(A.data$summary)){
     
-    
-    T0.ci <- apply(A.data$data$T0.list[[drug]][, -1, drop = FALSE],
-                   1, FUN = function(x)
-                     quantile(x, c(conf[1], conf[2]), na.rm = TRUE ))
-    
-    T0 <- A.data$data$T0.list[[drug]][, 1, drop = FALSE]
-    colnames(T0) <- "T0"
-    T0[, paste("T0", conf*100, sep = ".")] <- t(T0.ci)
-    
+    if(!is.null(A.data$data$T0.list)){
+      T0.ci <- apply(A.data$data$T0.list[[drug]][, -1, drop = FALSE],
+                     1, FUN = function(x)
+                       quantile(x, c(conf[1], conf[2]), na.rm = TRUE ))
+      
+      T0 <- A.data$data$T0.list[[drug]][, 1, drop = FALSE]
+      colnames(T0) <- "T0"
+      T0[, paste("T0", conf*100, sep = ".")] <- t(T0.ci)
+    }else{
+      
+      T0 <- data.frame()
+    }
     for(type in types){
       if(model == "G"){
         GI <- A.data$summary[[drug]][[model]][[type]]
@@ -3479,14 +3506,23 @@ CI.summary.DRdata <- function(A.data,..., model = "G",
                        2, FUN = function(x)
                          quantile(x, c(conf[1], conf[2]), na.rm = TRUE )))
       
+     
+      if(nrow(T0) == 0){
+        T0 <- data.frame(E = rep(NA, ncol(GI)))
+        rownames(T0) <- colnames(GI)
+        colnames(T0) <- type
+      }
+      
       int <- intersect(rownames(T0), colnames(GI))
+    
       T0[, type] <- NaN
+      
       T0[int, type] <- GI[1, int]
+      
       
       T0[, paste(type, conf*100, sep = "")] <- NaN
       int <- intersect(rownames(T0), rownames(GI.ci))
-      T0[int, paste(type, conf*100, sep = "")] <- GI.ci[int, ]
-      
+      T0[int, paste(type, conf*100, sep = "")] <- GI.ci[int, ]      
     }
     sum.list[[drug]] <- T0   
   }
@@ -3540,10 +3576,21 @@ pdfCI <-
       x.vec
     }
     
-    sum.list <- CI(A.data, model= c("G"), conf = conf,
+    sum.list <- CI(A.data, model= model, conf = conf,
                    dose.scale = dose.scale, 
                    dose.logfun = dose.logfun)
     
+    types.av <- colnames(sum.list[[1]])
+    types2 <- intersect(types, types.av)
+    
+    
+    if("LCt" %in% types & "LC50" %in% types.av )
+      types2 <- c(types2, "LCt")
+    if("AUCq" %in% types & "AUC" %in% types.av )
+      types2 <- c(types2, "AUCq")
+    
+    types <- types2
+      
     names <- vector()
     
     for(drug in drugs)
@@ -3555,24 +3602,52 @@ pdfCI <-
     for(drug in drugs){
       x1 <- sum.list[[drug]]
       
-      xx <- data.frame(
-        T0 = paste(round(x1$T0), " (", round(x1$T0.2.5), ";", 
-                   round(x1$T0.97.5), ")", sep = ""),
-        GI50  = paste(round2(x1$GI50, dec), " (", round2(x1$GI502.5, dec), ";", 
-                      round2(x1$GI5097.5, dec), ")", sep = ""),
-        TGI = paste(round2(x1$TGI, dec), " (", round2(x1$TGI2.5, dec), ";", 
-                    round2(x1$TGI97.5, dec), ")", sep = ""),
-        LCt = paste(round2(x1$LC50, dec), " (", round2(x1$LC502.5, dec), ";", 
-                    round2(x1$LC5097.5, dec), ")", sep = ""),
-        AUCq = paste(round(x1$AUC), " (", round(x1$AUC2.5), ";", 
-                     round(x1$AUC97.5), ")", sep = "")
-        
-      )
+      xx <- data.frame(cell.line = names)
+      row.names(xx) <- xx$cell.line
+      
+      if("T0" %in% types)
+        xx[, "T0"] <- paste(round(x1$T0), " (", round(x1$T0.2.5), ";", 
+                            round(x1$T0.97.5), ")", sep = "")
+      
+      if("GI50" %in% types)
+        xx[, "GI50"] <- paste(round2(x1$GI50, dec), " (", round2(x1$GI502.5, dec), ";", 
+                              round2(x1$GI5097.5, dec), ")", sep = "")
+      
+      if("TGI" %in% types)
+        xx[, "TGI"] <-paste(round2(x1$TGI, dec), " (", round2(x1$TGI2.5, dec), ";", 
+                            round2(x1$TGI97.5, dec), ")", sep = "")
       
       
-      row.names(xx) <- rownames(x1)
-      xx <- xx[, types]
+      if("LCt" %in% types)
+        xx[, "LCt"] <-paste(round2(x1$LC50, dec), " (", round2(x1$LC502.5, dec), ";", 
+                             round2(x1$LC5097.5, dec), ")", sep = "")
       
+      if("AUCq" %in% types)
+        xx[, "AUCq"] <-paste(round2(x1$AUC, dec), " (", round2(x1$AUC2.5, dec), ";", 
+                             round2(x1$AUC97.5, dec), ")", sep = "")
+      
+      xx <- xx[, -1]
+      
+      xx[xx == "NaN.00 (NA.00;NA.00)"] <- "-"
+      xx["NA.00 (NA.00;NA.00)" == xx] <- "-"
+#       xx <- data.frame(
+#         T0 = paste(round(x1$T0), " (", round(x1$T0.2.5), ";", 
+#                    round(x1$T0.97.5), ")", sep = ""),
+#         GI50  = paste(round2(x1$GI50, dec), " (", round2(x1$GI502.5, dec), ";", 
+#                       round2(x1$GI5097.5, dec), ")", sep = ""),
+#         TGI = paste(round2(x1$TGI, dec), " (", round2(x1$TGI2.5, dec), ";", 
+#                     round2(x1$TGI97.5, dec), ")", sep = ""),
+#         LCt = paste(round2(x1$LC50, dec), " (", round2(x1$LC502.5, dec), ";", 
+#                     round2(x1$LC5097.5, dec), ")", sep = ""),
+#         AUCq = paste(round(x1$AUC), " (", round(x1$AUC2.5), ";", 
+#                      round(x1$AUC97.5), ")", sep = "")
+#         
+#       )
+#       
+#       
+#       row.names(xx) <- rownames(x1)
+#       xx <- xx[, types]
+#       
       xx <- xx[rownames(data), ]
       data <- cbind(data, xx)
       

@@ -12,7 +12,7 @@ runDoseR <- function(){
   shiny::runApp(system.file('shiny', package='DoseResponse'))
 }
 
-readProtocol <- function(xls.file, mistakeval = "X"){
+readProtocol <- function(xls.file, mistakeval = "X", perl = "C:/perl/perl/bin/perl.exe"){
   
   filesetup <-  xls.file
   
@@ -21,21 +21,23 @@ readProtocol <- function(xls.file, mistakeval = "X"){
   
   protocol <- list()
   if(sos){
-    protocol[["setup"]] <- read.xls(filesetup, sheet = 1)
-    protocol[["conc"]]  <- read.xls(filesetup, sheet = 2)
+    protocol[["setup"]] <- read.xls(filesetup, sheet = 1, stringsAsFactors = FALSE)
+    protocol[["conc"]]  <- read.xls(filesetup, sheet = 2, stringsAsFactors = FALSE)
   }else{
     if(is64){
       protocol[["setup"]] <- 
         gdata::read.xls(filesetup, sheet = 1,
-                        perl = "C:/perl/perl/bin/perl.exe")
+                        perl = perl, 
+                        stringsAsFactors = FALSE)
       protocol[["conc"]]  <- 
         gdata::read.xls(filesetup, sheet = 2,
-                        perl = "C:/perl/perl/bin/perl.exe")
+                        perl = perl, 
+                        stringsAsFactors = FALSE)
     }else{
       protocol[["setup"]] <- 
-        read.xls(filesetup, colNames = TRUE, sheet = 1)
+        read.xls(filesetup, colNames = TRUE, sheet = 1, stringsAsFactors = FALSE)
       protocol[["conc"]]  <- 
-        read.xls(filesetup, colNames = TRUE, sheet = 2)
+        read.xls(filesetup, colNames = TRUE, sheet = 2, stringsAsFactors = FALSE)
     }
   }
   
@@ -60,7 +62,6 @@ readProtocol <- function(xls.file, mistakeval = "X"){
     protocol[["setup"]][
       ,!(colnames(protocol[["setup"]])[-1] %in%
            c("X", paste("X", 1: ncol(protocol[["setup"]]), sep = ".")))]
-  
   
   return(protocol)
 }

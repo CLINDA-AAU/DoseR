@@ -14,7 +14,7 @@
 #importFrom(XML,    readHTMLTable)
 #importFrom(RCurl, getForm)
 import(foreign, gdata, plyr, WriteXLS, nlme, tcltk,  RJSONIO, 
-       RCurl, XML, RColorBrewer,shiny,shinyIncubator)
+       RCurl, XML, RColorBrewer,shiny,shinyIncubator, prada)
 # GPL(>=3,   GPL-2 | GPL-3, GPL-2, MIT, GPL-2, GPL-2 | GPL-3, LGPL-3, BSD, BSD, BSD, APACHE)
 importFrom(Hmisc, latex)
 importFrom(animation,im.convert)

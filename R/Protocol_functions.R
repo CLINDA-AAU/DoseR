@@ -12,7 +12,7 @@ runDoseR <- function(){
   shiny::runApp(system.file('shiny', package='DoseResponse'))
 }
 
-readProtocol <- function(xls.file, mistakeval = "X", perl = "C:/perl/perl/bin/perl.exe"){
+readProtocol <- function(xls.file, mistakeval = "X", perl = "perl"){
   
   filesetup <-  xls.file
   

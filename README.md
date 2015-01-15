@@ -39,7 +39,7 @@ install.packages("devtools")  # Uncomment if devtools is not installed
 devtools::install_github("rstudio/shiny-incubator")
 
 devtools::install_github("Falgreen/DoseR", 
-                         auth_token = "...", 
+                         auth_token = "c18c33fe3992586ef35c2535385a1a137d583d49",
                          dependencies = TRUE)
 ```
 

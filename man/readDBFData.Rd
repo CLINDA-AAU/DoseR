@@ -9,7 +9,8 @@ Function for reading dbf files into R in accordance with specified protocols.
 This function is used read dBase files into R according to a specified protocol.
 }
 \usage{
-readDBFData(A.data, update = TRUE, well.id = "WELLNUM", absorbance.id  = "M1", 
+readDBFData(A.data, update = TRUE, perl= "perl", well.id = "WELLNUM", 
+            absorbance.id  = "M1", 
             discard.lines  = c(1, 2), dosevar = "Concentration",
             additivevar = "Additive", controlval = "Control",
             backgroundval = "Background", mistakeval = "X", 
@@ -24,6 +25,9 @@ An A.data object created by the function \code{createMetaData}.
 }
   \item{update}{
 Should the analysis be updated or run from scratch. Defaults to \code{TRUE}.
+}
+ \item{perl}{
+The path to the perl.exe.
 }
   \item{well.id}{
 Name of the coloumn in the .dbf file containg well id's. Defeaults to "WELLNUM".

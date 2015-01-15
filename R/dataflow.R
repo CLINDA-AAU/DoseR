@@ -390,6 +390,7 @@ createMetaData <- function(
 readDBFData <- function(
   A.data,  # Absorbance, data.frame, list  
   update         = TRUE, 
+  perl           = "perl",
   well.id        = "WELLNUM", # well identifier in the dbf file
   absorbance.id  = "M1",      # absorbance identifier in the dbf file 
   discard.lines  = c(1, 2),   # Discarded lines in the dbf file
@@ -688,10 +689,10 @@ readDBFData <- function(
         if(is64){
           protocols[[prot]][["setup"]] <- 
             gdata::read.xls(filesetup, sheet = 1,
-                            perl = "C:/perl/perl/bin/perl.exe")
+                            perl = perl)
           protocols[[prot]][["conc"]]  <- 
             gdata::read.xls(filesetup, sheet = 2,
-                            perl = "C:/perl/perl/bin/perl.exe")
+                            perl = perl)
         }else{
           protocols[[prot]][["setup"]] <- 
             read.xls(filesetup, colNames = TRUE, sheet = 1)
@@ -1260,6 +1261,7 @@ bgModel <- function(A.data, #...,
     }
   }
   
+  data <- data[!is.na(data[namevar]),]
   ## Changes compared to the previous version
   if(prior) { 
     ## Changes compared to old
@@ -2092,6 +2094,45 @@ bootstrap <- function(A.data, update = TRUE, n.samples = 50, max.iter = 100,
     #What ever the name the of the absorbance data used  it is replaced here
     eval(parse(text = paste(call$A.data, "<- A.data")))
     call$shiny.input <- NULL
+  
+  
+  ##############
+  ##
+
+  
+#   update<- FALSE
+#   
+#   parametrisation<-"unrestricted"
+#   
+#   outlier.test<-FALSE
+#   
+#   outlier.iter<-2
+#   
+#   weights<- "fitted"
+#   
+#   fitted.a<- FALSE
+#   
+#   progressbar<- "none"
+#   
+#   save<- FALSE
+#   
+#   verbose<- FALSE
+#   
+#   varpower.min<-0.001
+#   
+#   varpower.iter<- 50
+#   
+#   contr <-c("sum", "helmert", "treatment")
+  
+  ##
+  ####################
+  
+  
+  
+  
+  
+  
+  
   
     (bs <- do.call("bgModel", as.list(call)))
     

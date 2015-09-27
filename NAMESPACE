@@ -19,8 +19,10 @@ import(foreign, gdata, plyr, WriteXLS, nlme, tcltk,  RJSONIO,
 importFrom(Hmisc, latex)
 importFrom(animation,im.convert)
 importFrom(tools,texi2dvi)
+importFrom(rvest, html)
 #importFrom(prada, plotPlate)
 #import(WriteXLS)
+
 
 ## main functions
 export("createMetaData")

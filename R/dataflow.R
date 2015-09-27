@@ -103,7 +103,11 @@ concConvert <- function(x, mol.mass = 1, from = "ug/ml", to = "mol/l",
 ##
 ##
 
-
+# dbf.path       = file.path(SeedingConc.ext.dir, "DBF files")
+# protocol.path  = file.path(SeedingConc.ext.dir, "Protocols")
+# correctionname = "Correction"
+# date.format    = "%d%m%y"
+# data.file      = "GeneratedData/SeedingConc"
 
 createMetaData <- function( 
   data             = NULL,
@@ -1028,7 +1032,7 @@ readDBFData <- function(
     for(drug.iter in names(info))
       if(any(info[[drug.iter]] != "Drug not found"))
         mol.data[drug.iter, ] <- 
-      c(drug.iter, info[[drug.iter]]$"Chemical data"["Mol. mass", ])
+      c(drug.iter, info[[drug.iter]]$"Chemical data"["Molecular mass", ])
     
     mol.data <- mol.data[-1,]
     

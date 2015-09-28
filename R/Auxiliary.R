@@ -203,7 +203,8 @@ no.extension.vec <- function(x){
 drugInfo <- function(drug){
   
   the_url <- paste0("http://en.wikipedia.org/wiki/", drug)
-  table <- readHTMLTable(doc = rvest::html(the_url))[[1]]
+  table <- NULL
+  if(url.exists(the_url)) table <- readHTMLTable(doc = rvest::html(the_url))[[1]]
   
   if(!is.null(table)){
     

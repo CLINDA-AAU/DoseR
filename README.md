@@ -4,7 +4,7 @@ DoseR: Dose response analysis in R using the time independent G-model.
 The R-package `DoseR` is a set of tools used for dose response analysis.
 
 The packages is features (or, is planned to feature):
-* Pre-processing of dose response dataœ“
+* Pre-processing of dose response data
 * Estimation of the G-model
 
 

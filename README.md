@@ -34,16 +34,12 @@ install.packages("Hmisc")
 install.packages("animation")
 
 # From GitHub 
-install.packages("devtools")  # Uncomment if devtools is not installed
-
+install.packages("devtools")
 devtools::install_github("rstudio/shiny-incubator")
-
-devtools::install_github("Falgreen/DoseR", 
-                         auth_token = "c18c33fe3992586ef35c2535385a1a137d583d49",
-                         dependencies = TRUE)
+devtools::install_github("oncoclass/DoseR", dependencies = TRUE)
 ```
 
-`DoseR` is still under heavy development and should be considered unstable. Be sure that you have the [package development prerequisites](http://www.rstudio.com/ide/docs/packages/prerequisites) if you wish to install the package from the source.
+`DoseR` is still under development and should be considered unstable. Be sure that you have the [package development prerequisites](http://www.rstudio.com/ide/docs/packages/prerequisites) if you wish to install the package from the source.
 
 **Note:** The interface and function names may still see significant changes and
 modifications!

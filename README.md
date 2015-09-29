@@ -20,19 +20,8 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("prada")
 
 # Then from CRAN
-install.packages("foreign")
-install.packages("gdata")
-install.packages("plyr")
-install.packages("WriteXLS")
-install.packages("nlme")
-install.packages("RJSONIO")
-install.packages("RCurl")
-install.packages("XML")
-install.packages("RColorBrewer")
-install.packages("shiny")
-install.packages("Hmisc")
-install.packages("animation")
-
+install.packages(c("foreign", "gdata", "plyr", "WriteXLS", "nlme", "RJSONIO",
+                   "RCurl", "XML", "RColorBrewer", "Hmisc", "animation"))
 # From GitHub 
 install.packages("devtools")
 devtools::install_github("rstudio/shiny-incubator")

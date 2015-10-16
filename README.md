@@ -21,7 +21,7 @@ biocLite("prada")
 
 # Then from CRAN
 install.packages(c("foreign", "gdata", "plyr", "WriteXLS", "nlme", "RJSONIO",
-                   "RCurl", "XML", "RColorBrewer", "Hmisc", "animation"))
+                   "RCurl", "XML", "RColorBrewer", "Hmisc", "animation", "selectr"))
                    
 #Then install the rvest package version 0.2.0 from CRAN
 package <- "https://cran.r-project.org/src/contrib/Archive/rvest/rvest_0.2.0.tar.gz"
@@ -30,7 +30,7 @@ install.packages(package, repos = NULL, type = "source")
 # From GitHub 
 install.packages("devtools")
 devtools::install_github("rstudio/shiny-incubator")
-devtools::install_github("oncoclass/DoseR", dependencies = TRUE)
+devtools::install_github("oncoclass/DoseR", dependencies = FALSE)
 ```
 
 `DoseR` is still under development and should be considered unstable. Be sure that you have the [package development prerequisites](http://www.rstudio.com/ide/docs/packages/prerequisites) if you wish to install the package from the source.

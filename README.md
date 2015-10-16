@@ -4,7 +4,7 @@ DoseR: Dose response analysis in R using the time independent G-model.
 The R-package `DoseR` is a set of tools used for dose response analysis.
 
 The packages is features (or, is planned to feature):
-* Pre-processing of dose response dataœ“
+* Pre-processing of dose response data
 * Estimation of the G-model
 
 
@@ -20,34 +20,20 @@ source("http://bioconductor.org/biocLite.R")
 biocLite("prada")
 
 # Then from CRAN
-install.packages("foreign")
-install.packages("gdata")
-install.packages("plyr")
-install.packages("WriteXLS")
-install.packages("nlme")
-install.packages("RJSONIO")
-install.packages("RCurl")
-install.packages("XML")
-install.packages("RColorBrewer")
-install.packages("shiny")
-install.packages("Hmisc")
-install.packages("animation")
-
-#Install the rvest package version 0.2.0 from CRAN
+install.packages(c("foreign", "gdata", "plyr", "WriteXLS", "nlme", "RJSONIO",
+                   "RCurl", "XML", "RColorBrewer", "Hmisc", "animation"))
+                   
+#Then install the rvest package version 0.2.0 from CRAN
 package <- "https://cran.r-project.org/src/contrib/Archive/rvest/rvest_0.2.0.tar.gz"
 install.packages(package, repos = NULL, type = "source")
 
 # From GitHub 
-install.packages("devtools")  # Uncomment if devtools is not installed
-
+install.packages("devtools")
 devtools::install_github("rstudio/shiny-incubator")
-
-devtools::install_github("Falgreen/DoseR", 
-                         auth_token = "c18c33fe3992586ef35c2535385a1a137d583d49",
-                         dependencies = TRUE)
+devtools::install_github("oncoclass/DoseR", dependencies = TRUE)
 ```
 
-`DoseR` is still under heavy development and should be considered unstable. Be sure that you have the [package development prerequisites](http://www.rstudio.com/ide/docs/packages/prerequisites) if you wish to install the package from the source.
+`DoseR` is still under development and should be considered unstable. Be sure that you have the [package development prerequisites](http://www.rstudio.com/ide/docs/packages/prerequisites) if you wish to install the package from the source.
 
 **Note:** The interface and function names may still see significant changes and
 modifications!

@@ -33,6 +33,10 @@ install.packages("shiny")
 install.packages("Hmisc")
 install.packages("animation")
 
+#Install the rvest package version 0.2.0 from CRAN
+package <- "https://cran.r-project.org/src/contrib/Archive/rvest/rvest_0.2.0.tar.gz"
+install.packages(package, repos = NULL, type = "source")
+
 # From GitHub 
 install.packages("devtools")  # Uncomment if devtools is not installed
 

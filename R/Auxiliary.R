@@ -238,7 +238,7 @@ drugInfo <- function(drug){
     
     chem.info$"Identifiers"[,1] <- gsub("\\s[YN]", "", chem.info$"Identifiers"[,1], perl = TRUE)
     
-    chem.info$"Chemical data" <- table[c("Formula", "Molecular mass") , 2, drop = FALSE]
+    chem.info$"Chemical data" <- table[c("Formula", "Molar mass") , 2, drop = FALSE]
     
     chem.info$"SMILES" <- 
       gsub("\\s[YN]", "", gsub("SMILES\n", "", table[grepl("SMILES", table[,1]),1]))

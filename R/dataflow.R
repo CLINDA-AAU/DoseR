@@ -1026,13 +1026,13 @@ readDBFData <- function(
   if(!prior){
     info <- list()
     for(drug.iter in unique(data[, drugvar]))
-      info[[drug.iter]] <- DoseR:::drugInfo(drug.iter)
+      info[[drug.iter]] <- drugInfo(drug.iter)
     
     mol.data <- data.frame(drug = "drug", mol.mass = "mol.mass", stringsAsFactors=FALSE)
     for(drug.iter in names(info))
       if(any(info[[drug.iter]] != "Drug not found"))
         mol.data[drug.iter, ] <- 
-      c(drug.iter, info[[drug.iter]]$"Chemical data"["Molecular mass", ])
+      c(drug.iter, info[[drug.iter]]$"Chemical data"["Molar mass", ])
     
     mol.data <- mol.data[-1,]
     
@@ -1048,7 +1048,9 @@ readDBFData <- function(
       info[[drug.iter]] <- drugInfo(drug.iter)
       if(any(info[[drug.iter]] != "Drug not found"))
         mol.data[drug.iter, ] <- 
-        c(drug.iter, info[[drug.iter]]$"Chemical data"["Mol. mass", ])
+        c(drug.iter, info[[drug.iter]]$"Chemical data"["Molar mass
+                                                       
+                                                       ", ])
     }
     
     mol.data <- mol.data[unique(data[, drugvar]), ]   

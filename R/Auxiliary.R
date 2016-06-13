@@ -212,6 +212,7 @@ drugInfo <- function(drug){
     for(i in 1:ncol(table))
       table[,i] <- as.character(table[,i])
     
+    table <- table[!is.na(table[,2]), ]
     table <- table[table[,1] != "", ]
     rownames(table) <- table[,1]
     

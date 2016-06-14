@@ -1361,6 +1361,9 @@ bgModel <- function(A.data, #...,
     data$NB <- data[,A]
   }
   
+  ## Truncate NB at zero
+  data$NB[data$NB < 0] <- 0
+  
   lev.table <- table(paste(data$level[!duplicated(paste(data$plateset, data[,timevar]))] ))
   
   prob.list <- list()

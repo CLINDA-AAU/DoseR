@@ -200,63 +200,78 @@ no.extension.vec <- function(x){
 ## regarding a drug from wikipedia
 ##
 ##
+# drugInfo <- function(drug){
+# 
+#   the_url <- paste0("http://en.wikipedia.org/wiki/", drug)
+#   table <- NULL
+#   if(url.exists(the_url)) table <- readHTMLTable(doc = rvest::html(the_url))[[1]]
+# 
+#   if(!is.null(table)){
+# 
+#     #flyttet dette {
+#     for(i in 1:ncol(table))
+#       table[,i] <- as.character(table[,i])
+# 
+#     table <- table[!is.na(table[,2]), ]
+#     table <- table[table[,1] != "", ]
+#     rownames(table) <- table[,1]
+# 
+#     table[,2] <- gsub("????\u0080\u0093", "-", table[,2])
+#     table[,2] <- gsub("????\u0084\u009e", "Rx", table[,2])
+#     # } og hertil, ind i if sentenc
+# 
+#     chem.info <- list()
+# 
+#     if(any(grepl("IUPAC", table[,1]))){
+#       wh<- which(grepl("IUPAC", table[,1])) +1
+#       chem.info$"Systematic (IUPAC) name" <- table[wh,1]
+#     }
+# 
+#     if(any(grepl("Target", table[,1])))
+#       chem.info$"Target" <- table["Target", 2]
+# 
+#     chem.info$"Clinical data" <- table[c("Trade names", "AHFS/Drugs.com", "MedlinePlus",
+#                                          "Pregnancy cat.", "Legal status", "Routes"), 2, drop = FALSE]
+#     chem.info$"Pharmacokinetic data" <- table[c("Bioavailability", "Metabolism", "Half-life", "Excretion"), 2, drop = FALSE]
+#     chem.info$"Identifiers" <- table[c("CAS number", "ATC code", "PubChem",
+#                                        "DrugBank", "ChemSpider", "UNII", "KEGG",
+#                                        "ChEBI", "ChEMBL") , 2, drop = FALSE]
+# 
+#     chem.info$"Identifiers"[,1] <- gsub("\\s[YN]", "", chem.info$"Identifiers"[,1], perl = TRUE)
+# 
+#     chem.info$"Chemical data" <- table[c("Formula", "Molar mass") , 2, drop = FALSE]
+# 
+#     chem.info$"SMILES" <-
+#       gsub("\\s[YN]", "", gsub("SMILES\n", "", table[grepl("SMILES", table[,1]),1]))
+# 
+#     InChI <-
+#       gsub("\\s[YN]", "", gsub("InChI\n\nInChI=", "", table[grepl("InChI", table[,1]),1]))
+# 
+#     if(length(InChI) > 0) {
+#       chem.info$"InChI" <-  strsplit(InChI, "\nKey:")[[1]]
+#       names(chem.info$"InChI") <- c("InChI", "Key")
+#     }
+#   }else{
+#     chem.info <- "Drug not found"
+#   }
+# 
+#   return(chem.info)
+# }
+
 drugInfo <- function(drug){
   
-  the_url <- paste0("http://en.wikipedia.org/wiki/", drug)
-  table <- NULL
-  if(url.exists(the_url)) table <- readHTMLTable(doc = rvest::html(the_url))[[1]]
+  chem.info <- list()
   
-  if(!is.null(table)){
-    
-    #flyttet dette {
-    for(i in 1:ncol(table))
-      table[,i] <- as.character(table[,i])
-    
-    table <- table[!is.na(table[,2]), ]
-    table <- table[table[,1] != "", ]
-    rownames(table) <- table[,1]
-    
-    table[,2] <- gsub("????\u0080\u0093", "-", table[,2])
-    table[,2] <- gsub("????\u0084\u009e", "Rx", table[,2])
-    # } og hertil, ind i if sentenc
-    
-    chem.info <- list()
-    
-    if(any(grepl("IUPAC", table[,1]))){
-      wh<- which(grepl("IUPAC", table[,1])) +1
-      chem.info$"Systematic (IUPAC) name" <- table[wh,1]
-    }
-    
-    if(any(grepl("Target", table[,1])))
-      chem.info$"Target" <- table["Target", 2]
-    
-    chem.info$"Clinical data" <- table[c("Trade names", "AHFS/Drugs.com", "MedlinePlus", 
-                                         "Pregnancy cat.", "Legal status", "Routes"), 2, drop = FALSE]
-    chem.info$"Pharmacokinetic data" <- table[c("Bioavailability", "Metabolism", "Half-life", "Excretion"), 2, drop = FALSE]
-    chem.info$"Identifiers" <- table[c("CAS number", "ATC code", "PubChem", 
-                                       "DrugBank", "ChemSpider", "UNII", "KEGG", 
-                                       "ChEBI", "ChEMBL") , 2, drop = FALSE]
-    
-    chem.info$"Identifiers"[,1] <- gsub("\\s[YN]", "", chem.info$"Identifiers"[,1], perl = TRUE)
-    
-    chem.info$"Chemical data" <- table[c("Formula", "Molar mass") , 2, drop = FALSE]
-    
-    chem.info$"SMILES" <- 
-      gsub("\\s[YN]", "", gsub("SMILES\n", "", table[grepl("SMILES", table[,1]),1]))
-    
-    InChI <- 
-      gsub("\\s[YN]", "", gsub("InChI\n\nInChI=", "", table[grepl("InChI", table[,1]),1]))
-    
-    if(length(InChI) > 0) {
-      chem.info$"InChI" <-  strsplit(InChI, "\nKey:")[[1]]
-      names(chem.info$"InChI") <- c("InChI", "Key") 
-    }
-  }else{
+  if(drug %in% drug.mass$drug_name){
+    table <- drug.mass[drug.mass$drug_name == drug, ]
+    chem.info$"Chemical data" <- data.frame(table$molar_mass, row.names = "Molar mass")
+    }else{
     chem.info <- "Drug not found"
   }
   
   return(chem.info)
 }
+
 
 ##
 ##

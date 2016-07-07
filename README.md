@@ -23,10 +23,6 @@ biocLite("prada")
 install.packages(c("foreign", "gdata", "plyr", "WriteXLS", "nlme", "RJSONIO",
                    "RCurl", "XML", "RColorBrewer", "Hmisc", "animation", "selectr"))
                    
-#Then install the rvest package version 0.2.0 from CRAN
-package <- "https://cran.r-project.org/src/contrib/Archive/rvest/rvest_0.2.0.tar.gz"
-install.packages(package, repos = NULL, type = "source")
-
 # From GitHub 
 install.packages("devtools")
 devtools::install_github("rstudio/shiny-incubator")

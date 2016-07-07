@@ -649,7 +649,7 @@ readDBFDataShiny <- function(
                    mol.data <- data.frame(drug = "drug", mol.mass = "mol.mass", stringsAsFactors=FALSE)
                    for(drug.iter in names(info))
                      mol.data[drug.iter, ] <- 
-                     c(drug.iter, info[[drug.iter]]$"Chemical data"["Mol. mass", ])
+                     c(drug.iter, info[[drug.iter]]$"Chemical data"["Molar mass", ])
                    
                    mol.data <- mol.data[-1,]
                    
@@ -664,7 +664,7 @@ readDBFDataShiny <- function(
                    for(drug.iter in (unique(data[, drugvar]) %w/o% names(info))){
                      info[[drug.iter]] <- drugInfo(drug.iter)
                      mol.data[drug.iter, ] <- 
-                       c(drug.iter, info[[drug.iter]]$"Chemical data"["Mol. mass", ])
+                       c(drug.iter, info[[drug.iter]]$"Chemical data"["Molar mass", ])
                    }
                    
                    mol.data <- mol.data[unique(data[, drugvar]), ]   

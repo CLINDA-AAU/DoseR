@@ -259,7 +259,7 @@ no.extension.vec <- function(x){
 # }
 
 drugInfo <- function(drug){
-  
+  data(drug.mass)
   chem.info <- list()
   
   if(drug %in% drug.mass$drug_name){

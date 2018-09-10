@@ -26,7 +26,7 @@ install.packages(c("foreign", "gdata", "plyr", "WriteXLS", "nlme", "RJSONIO",
 # From GitHub 
 install.packages("devtools")
 devtools::install_github("rstudio/shiny-incubator")
-devtools::install_github("oncoclass/DoseR", dependencies = FALSE)
+devtools::install_github("HaemAalborg/DoseR", dependencies = FALSE)
 ```
 
 `DoseR` is still under development and should be considered unstable. Be sure that you have the [package development prerequisites](http://www.rstudio.com/ide/docs/packages/prerequisites) if you wish to install the package from the source.

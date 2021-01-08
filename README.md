@@ -16,8 +16,10 @@ If you wish to install the latest version of `DoseR` directly from the master br
 # Install necessary packages 
 
 # First from bioconductor
-source("http://bioconductor.org/biocLite.R")
-biocLite("prada")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("prada")
 
 # Then from CRAN
 install.packages(c("foreign", "gdata", "plyr", "WriteXLS", "nlme", "RJSONIO",

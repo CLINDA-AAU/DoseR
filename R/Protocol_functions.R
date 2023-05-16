@@ -31,9 +31,9 @@ readProtocol <- function(xls.file, mistakeval = "X", perl = "perl"){
         readxl::read_excel(filesetup, sheet = 2)
     }else{
       protocol[["setup"]] <- 
-        read_excel(filesetup, colNames = TRUE, sheet = 1)
+        read_excel(filesetup, col_names = TRUE, sheet = 1)
       protocol[["conc"]]  <- 
-        read_excel(filesetup, colNames = TRUE, sheet = 2)
+        read_excel(filesetup, col_names = TRUE, sheet = 2)
     }
   }
   

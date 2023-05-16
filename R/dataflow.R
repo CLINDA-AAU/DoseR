@@ -697,9 +697,9 @@ readDBFData <- function(
             readxl::read_excel(filesetup, sheet = 2)
         }else{
           protocols[[prot]][["setup"]] <- 
-            read_excel(filesetup, colNames = TRUE, sheet = 1)
+            read_excel(filesetup, col_names = TRUE, sheet = 1)
           protocols[[prot]][["conc"]]  <- 
-            read_excel(filesetup, colNames = TRUE, sheet = 2)
+            read_excel(filesetup, col_names = TRUE, sheet = 2)
         }
       }
       

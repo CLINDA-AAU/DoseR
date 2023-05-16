@@ -5,9 +5,7 @@
 
 #plyr
 
-#importFrom(gdata, sheetNames)
-#importFrom(gdata, sheetCount)
-#importFrom(gdata, xls2sep)
+#importFrom(readxl, excel_sheets)
 # pracma trapz
 #importFrom(RJSONIO, fromJSON)
 #importFrom(XML,    readHTMLTable)

@@ -7,4 +7,4 @@ Author: Steffen Falgreen Larsen
 Maintainer: Steffen Falgreen Larsen <sfl@rn.dk>
 Description: R package for analysing dose response experiments.
 License: GPL (>=2)
-Depends: foreign, plyr, gdata, WriteXLS, nlme, tcltk, RJSONIO, RCurl, XML, Hmisc, tools, animation, RColorBrewer, shiny, shinyIncubator
+Depends: foreign, plyr, WriteXLS, nlme, tcltk, RJSONIO, RCurl, XML, Hmisc, tools, animation, RColorBrewer, shiny, shinyIncubator, readxl

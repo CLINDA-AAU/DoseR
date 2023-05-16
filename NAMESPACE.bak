@@ -5,7 +5,6 @@
 
 #plyr
 
-#importFrom(prada, plotPlate)
 #importFrom(gdata, sheetNames)
 #importFrom(gdata, sheetCount)
 #importFrom(gdata, xls2sep)
@@ -14,13 +13,12 @@
 #importFrom(XML,    readHTMLTable)
 #importFrom(RCurl, getForm)
 import(foreign, gdata, plyr, WriteXLS, nlme, tcltk,  RJSONIO, 
-       RCurl, XML, RColorBrewer,shiny,shinyIncubator, prada)
+       RCurl, XML, RColorBrewer,shiny,shinyIncubator)
 # GPL(>=3,   GPL-2 | GPL-3, GPL-2, MIT, GPL-2, GPL-2 | GPL-3, LGPL-3, BSD, BSD, BSD, APACHE)
 importFrom(Hmisc, latex)
 importFrom(animation,im.convert)
 importFrom(tools,texi2dvi)
 #importFrom(rvest, html)
-#importFrom(prada, plotPlate)
 #import(WriteXLS)
 
 

@@ -772,7 +772,7 @@ createMetaDataDir <- function(
     namevar2 <- namevar
   }
   if(!is.null(additional.metadata)){
-    rownames(additional.metadata) <- additional.metadata[,namevar]
+    rownames(additional.metadata) <- additional.metadata[,namevar, drop = T]
     cols <-colnames(additional.metadata) %w/o% namevar
     met.wide[, cols] <-  additional.metadata[met.wide[, namevar2], cols]
   }

@@ -437,10 +437,7 @@ createMetaDataDir <- function(
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read.xls(additional.metadata ,
-               fileEncoding = "latin1",
-               method = "tab",
-               stringsAsFactors = FALSE)
+      read_excel(additional.metadata)
   }
   
   if(!is.null(additional.metadata)){
@@ -527,10 +524,7 @@ createMetaDataDir <- function(
     sheet.count <- length(sheet.names)
     
     for(i in 1:sheet.count) {
-      meta.sheets[[i]] <- read.xls(xls.file, sheet = i,
-                                   fileEncoding = "latin1",
-                                   method = "tab",
-                                   stringsAsFactors = FALSE)
+      meta.sheets[[i]] <- read_excel(xls.file, sheet = i)
     }
     names(meta.sheets) <- excel_sheets(xls.file)[1:sheet.count]
     metadata.xls <- meta.sheets[["Data"]]
@@ -1165,18 +1159,12 @@ createMetaDataXls <- function(
     excel.file <- file.choose()
   
   metadata <- 
-    read.xls(excel.file,
-             fileEncoding = "latin1",
-             method = "tab",
-             stringsAsFactors = FALSE)
+    read_excel(excel.file)
   
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read.xls(additional.metadata ,
-               fileEncoding = "latin1",
-               method = "tab",
-               stringsAsFactors = FALSE)
+      read_excel(additional.metadata)
   }
   
   if(!is.null(additional.metadata)){
@@ -1398,10 +1386,7 @@ createMetaDataList <- function(
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read.xls(additional.metadata,
-               fileEncoding = "latin1",
-               method = "tab",
-               stringsAsFactors = FALSE)
+      read_excel(additional.metadata)
   }
   
   if(!is.null(additional.metadata)){
@@ -1711,10 +1696,7 @@ createMetaDataDataFrame <- function(
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read.xls(additional.metadata ,
-               fileEncoding = "latin1",
-               method = "tab",
-               stringsAsFactors = FALSE)
+      read_excel(additional.metadata)
   }
   
   if(!is.null(additional.metadata)){

@@ -687,19 +687,19 @@ readDBFData <- function(
       sos  <- grepl("darwin", sessionInfo()[1]$R.version$os)
       
       if(sos){
-        protocols[[prot]][["setup"]] <- read_excel(filesetup, sheet = 1)
-        protocols[[prot]][["conc"]]  <- read_excel(filesetup, sheet = 2)
+        protocols[[prot]][["setup"]] <- data.frame(read_excel(filesetup, sheet = 1))
+        protocols[[prot]][["conc"]]  <- data.frame(read_excel(filesetup, sheet = 2))
       }else{
         if(is64){
           protocols[[prot]][["setup"]] <- 
-            readxl::read_excel(filesetup, sheet = 1)
+            data.frame(read_excel(filesetup, sheet = 1))
           protocols[[prot]][["conc"]]  <- 
-            readxl::read_excel(filesetup, sheet = 2)
+            data.frame(read_excel(filesetup, sheet = 2))
         }else{
           protocols[[prot]][["setup"]] <- 
-            read_excel(filesetup, col_names = TRUE, sheet = 1)
+            data.frame(read_excel(filesetup, col_names = TRUE, sheet = 1))
           protocols[[prot]][["conc"]]  <- 
-            read_excel(filesetup, col_names = TRUE, sheet = 2)
+            data.frame(read_excel(filesetup, col_names = TRUE, sheet = 2))
         }
       }
       
@@ -1096,7 +1096,7 @@ readDBFData <- function(
   if(prior) {
     
     new.meta <- old$meta.list$readDBFData
-    row.names(new.meta) <- new.meta[,idvar]
+    row.names(new.meta) <- new.meta[,idvar, drop = T]
     
     com.rows <- intersect(old.meta[, idvar], new.meta[, idvar])
     

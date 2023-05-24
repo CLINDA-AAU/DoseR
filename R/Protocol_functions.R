@@ -21,19 +21,19 @@ readProtocol <- function(xls.file, mistakeval = "X", perl = "perl"){
   
   protocol <- list()
   if(sos){
-    protocol[["setup"]] <- read_excel(filesetup, sheet = 1)
-    protocol[["conc"]]  <- read_excel(filesetup, sheet = 2)
+    protocol[["setup"]] <- data.frame(read_excel(filesetup, sheet = 1))
+    protocol[["conc"]]  <- data.frame(read_excel(filesetup, sheet = 2))
   }else{
     if(is64){
       protocol[["setup"]] <- 
-        readxl::read_excel(filesetup, sheet = 1)
+        data.frame(read_excel(filesetup, sheet = 1))
       protocol[["conc"]]  <- 
-        readxl::read_excel(filesetup, sheet = 2)
+        data.frame(read_excel(filesetup, sheet = 2))
     }else{
       protocol[["setup"]] <- 
-        read_excel(filesetup, col_names = TRUE, sheet = 1)
+        data.frame(read_excel(filesetup, col_names = TRUE, sheet = 1))
       protocol[["conc"]]  <- 
-        read_excel(filesetup, col_names = TRUE, sheet = 2)
+        data.frame(read_excel(filesetup, col_names = TRUE, sheet = 2))
     }
   }
   
@@ -263,13 +263,19 @@ editProtocol <- function(protocol){
   protocol$setup[, " "] <- row.names(protocol$setup)
   protocol$setup <- protocol$setup[,c(ncol(protocol$setup), 1:(ncol(protocol$setup)- 1))]
   
-  WriteXLS(names(protocol), ExcelFileName = tempfile,
-           row.names=FALSE, col.names=TRUE, 
-           SheetNames = names(protocol), 
-           BoldHeaderRow = TRUE, 
-           Encoding = "UTF-8",
-           envir = list2env(protocol),
-           FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
+  
+  write_xlsx(protocol, 
+			 path=tempfile, 
+             format_headers = TRUE,
+		     col_names = TRUE)
+  
+  #WriteXLS(names(protocol), ExcelFileName = tempfile,
+  #         row.names=FALSE, col.names=TRUE, 
+  #         SheetNames = names(protocol), 
+  #         BoldHeaderRow = TRUE, 
+  #         Encoding = "UTF-8",
+  #         envir = list2env(protocol),
+  #         FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
   
   
   system2("open", paste("'", tempfile, "'", 
@@ -393,14 +399,19 @@ useTempProtocol<- function(A.data, protocol = NULL, protocolname, dbf.files){
   xls.file = file.path(
     file.info$protocol[no.extension(new.name), "file.path",],
     new.name)
+	
+   write_xlsx(protocol, 
+			 path=xls.file, 
+             format_headers = TRUE,
+		     col_names = TRUE)
   
-  WriteXLS(names(protocol), ExcelFileName = xls.file,
-           row.names=TRUE, col.names=TRUE, 
-           SheetNames = names(protocol), 
-           BoldHeaderRow = TRUE, 
-           Encoding = "UTF-8",
-           envir = list2env(protocol),
-           FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
+   #WriteXLS(names(protocol), ExcelFileName = xls.file,
+   #        row.names=TRUE, col.names=TRUE, 
+   #        SheetNames = names(protocol), 
+   #        BoldHeaderRow = TRUE, 
+   #        Encoding = "UTF-8",
+   #        envir = list2env(protocol),
+   #        FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
   
   ################################################
   ### Track changes
@@ -544,14 +555,19 @@ useNewProtocol<- function(A.data, protocol = NULL, protocolname, dbf.files){
   xls.file = file.path(
     file.info$protocol[no.extension(new.name), "file.path",],
     new.name)
+	
+  write_xlsx(protocol, 
+			 path=xls.file, 
+             format_headers = TRUE,
+		     col_names = TRUE)
   
-  WriteXLS(names(protocol), ExcelFileName = xls.file,
-           row.names=TRUE, col.names=TRUE, 
-           SheetNames = names(protocol), 
-           BoldHeaderRow = TRUE, 
-           Encoding = "UTF-8",
-           envir = list2env(protocol),
-           FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
+  #WriteXLS(names(protocol), ExcelFileName = xls.file,
+  #         row.names=TRUE, col.names=TRUE, 
+  #        SheetNames = names(protocol), 
+  #         BoldHeaderRow = TRUE, 
+  #         Encoding = "UTF-8",
+  #         envir = list2env(protocol),
+  #         FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
   
   
   system2("open", paste("'", file.path(as.character(

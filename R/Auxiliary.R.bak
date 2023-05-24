@@ -437,7 +437,7 @@ createMetaDataDir <- function(
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read_excel(additional.metadata)
+      data.frame(read_excel(additional.metadata))
   }
   
   if(!is.null(additional.metadata)){
@@ -464,7 +464,7 @@ createMetaDataDir <- function(
   ##
   #############################################
   
-  xls.file  <- paste(data.file, ".xls",   sep = "")
+  xls.file  <- paste(data.file, ".xlsx",   sep = "")
   data.file <- paste(data.file, ".RData", sep = "")
   
   
@@ -497,7 +497,7 @@ createMetaDataDir <- function(
       
       excel.2 <- paste(no.extension(xls.file), " last changed ",
                         file.info(xls.file)$mtime, 
-                        ".xls", sep = "")
+                        ".xlsx", sep = "")
       
       file.copy(from=xls.file, to=excel.2)
       
@@ -524,7 +524,7 @@ createMetaDataDir <- function(
     sheet.count <- length(sheet.names)
     
     for(i in 1:sheet.count) {
-      meta.sheets[[i]] <- read_excel(xls.file, sheet = i)
+      meta.sheets[[i]] <- data.frame(read_excel(xls.file, sheet = i))
     }
     names(meta.sheets) <- excel_sheets(xls.file)[1:sheet.count]
     metadata.xls <- meta.sheets[["Data"]]
@@ -540,7 +540,7 @@ createMetaDataDir <- function(
     }
     if(!is.null(date.format))
       metadata.xls[, "setupdate"] <- as.Date(metadata.xls[, "setupdate"])
-    #as.POSIXct(as.Date(metadata.xls[, "setupdate"]))    
+    as.POSIXct(as.Date(metadata.xls[, "setupdate"]))    
     
     
     if(old$call$createMetaData$format == "wide" &
@@ -772,7 +772,7 @@ createMetaDataDir <- function(
     namevar2 <- namevar
   }
   if(!is.null(additional.metadata)){
-    rownames(additional.metadata) <- additional.metadata[,namevar]
+    rownames(additional.metadata) <- additional.metadata[,namevar, drop = T]
     cols <-colnames(additional.metadata) %w/o% namevar
     met.wide[, cols] <-  additional.metadata[met.wide[, namevar2], cols]
   }
@@ -806,9 +806,9 @@ createMetaDataDir <- function(
       
       
       row.names(met.wide) <- met.wide[, idvar]
-      row.names(metadata.xls) <- metadata.xls[, idvar]
+      row.names(metadata.xls) <- metadata.xls[, idvar, drop = T]
       
-      rem.id <- intersect(metadata.xls[, idvar], met.wide[, idvar])
+      rem.id <- intersect(metadata.xls[, idvar, drop = T], met.wide[, idvar, drop = T])
       metadata.xls <- metadata.xls[rem.id, ]
       
       new.id <- met.wide[, idvar] %w/o% metadata.xls[, idvar]
@@ -862,13 +862,15 @@ createMetaDataDir <- function(
     }else{
       
       row.names(met.wide) <- met.wide[, idvar]
-      row.names(metadata.xls) <- metadata.xls[, idvar]
+      row.names(metadata.xls) <- metadata.xls[, idvar, drop = T]
       
       rem.id <- intersect(metadata.xls[, idvar], met.wide[, idvar])
       metadata.xls <- metadata.xls[rem.id, ]
       
+	    
       new.id <- met.wide[, idvar] %w/o% metadata.xls[, idvar]
-      if(length(new.id))
+	  
+	  if(length(new.id))
         metadata.xls[new.id, idvar] <- new.id
       
       new.col <- colnames(met.wide)  %w/o% colnames(metadata.xls)
@@ -1008,12 +1010,10 @@ createMetaDataDir <- function(
   
   meta.sheets[["Data"]] <- metadata.full
   meta.sheets[["additional.metadata"]] <- additional.metadata
-  WriteXLS(names(meta.sheets), ExcelFileName = xls.file,
-           SheetNames = names(meta.sheets), 
-           BoldHeaderRow = TRUE, 
-           Encoding = "UTF-8",
-           envir = list2env(meta.sheets),
-           FreezeRow = 1, FreezeCol = 1, AdjWidth = TRUE)
+  write_xlsx(meta.sheets, 
+			 path=  xls.file, 
+             format_headers = TRUE,
+		     col_names = TRUE)
   
   if(format == "wide"){
     data <- metadata.full
@@ -1159,12 +1159,12 @@ createMetaDataXls <- function(
     excel.file <- file.choose()
   
   metadata <- 
-    read_excel(excel.file)
+    data.frame(read_excel(excel.file))
   
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read_excel(additional.metadata)
+      data.frame(read_excel(additional.metadata))
   }
   
   if(!is.null(additional.metadata)){
@@ -1386,7 +1386,7 @@ createMetaDataList <- function(
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read_excel(additional.metadata)
+      data.frame(read_excel(additional.metadata))
   }
   
   if(!is.null(additional.metadata)){
@@ -1463,7 +1463,7 @@ createMetaDataList <- function(
   
   
   if(is.null(protocol.files))    
-    protocol.files <- dir(protocol.path, pattern = ".xls", full.names=TRUE)
+    protocol.files <- dir(protocol.path, pattern = ".xls|.xlsx", full.names=TRUE)
   
   protocol.files <- unique(protocol.files)
   
@@ -1696,7 +1696,7 @@ createMetaDataDataFrame <- function(
   
   if(class(additional.metadata) == "character"){
     additional.metadata <- 
-      read_excel(additional.metadata)
+      data.frame(read_excel(additional.metadata))
   }
   
   if(!is.null(additional.metadata)){
@@ -1763,7 +1763,7 @@ createMetaDataDataFrame <- function(
   
   row.names(dbf.info) <- no.extension.vec(basename(dbf.files))
   
-  protocol.files <- dir(protocol.path, pattern = ".xls", full.names=TRUE)
+  protocol.files <- dir(protocol.path, pattern = ".xls|.xlsx", full.names=TRUE)
   
   protocol.files <- unique(protocol.files)
   
@@ -2376,7 +2376,7 @@ BGfunction <- function(A, B = NULL, type = NULL,
       colnames(contr) <- rownames(contr)[-1]
     colnames(contr) <- paste("plate", colnames(contr), sep = "")
     mat <- ((contr[temp[,plate], ]))
-    if(class(mat) != "matrix"){
+    if(!any(class(mat) == "matrix")){
       mat <- as.matrix(mat)
       colnames(mat) <- paste("plate", rownames(contr)[-1], sep = "")
     }

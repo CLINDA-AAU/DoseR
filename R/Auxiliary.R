@@ -2754,9 +2754,9 @@ growth.function <- function(data, cut = 0.025,
   temp$type <- as.factor(as.character(temp$type)) 
   
   fit <- list()
-  class(fit) <- "error"
-  fit[[1]] <- "error"
-  fit$logLik <- 0
+  #class(fit) <- "error"
+  #fit[[1]] <- "error"
+  #fit$logLik <- 0
   if(fit.reci.first){
     parametrisation2 <- "reci"
     
@@ -2931,7 +2931,8 @@ growth.function <- function(data, cut = 0.025,
     }
     
   }
-  if(class(fit)[1] == "error" | !fit.reci.first){
+  #if(class(fit)[1] == "error" | !fit.reci.first){
+  if(is.null(fit) | !fit.reci.first){
     formula <- switch(parametrisation,
                       none =   formula(Bcut ~ N0 * 2^((1/T0 - control/Tcp) * t)),
                       reci =   formula(Bcut ~ N0 * 2^((T0 - control*Tcp) * t)),
@@ -2977,7 +2978,8 @@ growth.function <- function(data, cut = 0.025,
   
   
   
-  if(class(fit)[1] == "error"){
+  #if(class(fit)[1] == "error"){
+  if(is.null(fit)){
     
     start.TCp <- switch(parametrisation,
                         none = - tc.mat[levels(temp$type), "st.TCp"],
@@ -3001,7 +3003,8 @@ growth.function <- function(data, cut = 0.025,
   }
   #id.fits[[id]] <- fit
   
-  if(class(fit)[1] != "error"){
+  #if(class(fit)[1] != "error"){
+  if(!is.null(fit)){
     COEF <- coef(fit)
     
     tc.mat[, "N0"] <- COEF["N0"]
@@ -3029,6 +3032,11 @@ growth.function <- function(data, cut = 0.025,
     tc.mat[,"TC"] <- 1/(1/tc.mat[,"T0"] + 1/tc.mat[,"TCp"])
     tc.mat[,"G"] <- (tc.mat[,"T0"] / tc.mat[,"TC"] ) *100
     
+  }else{
+	fit <- list()
+	class(fit) <- "error"
+	fit[[1]] <- "error"
+	fit$logLik <- 0
   }
   return(list(fit = fit, summary = tc.mat, fit.list = fit.list))
 }  

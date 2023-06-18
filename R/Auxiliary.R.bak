@@ -2716,7 +2716,7 @@ growth.function <- function(data, cut = 0.025,
                      t = data[,timevar] + data[,incubationvar] / 2,
                      Concentration = data[, dosevar])
   
-  tc.mat <- matrix(NaN, ncol = 6, nrow = length(unique(temp$type)))
+  tc.mat <- data.frame(matrix(NaN, ncol = 6, nrow = length(unique(temp$type))))
   
   rownames(tc.mat) <- unique(temp$type)
   
@@ -2749,14 +2749,14 @@ growth.function <- function(data, cut = 0.025,
   temp$type <- as.factor(temp$type)
   
   ## remove the ones which have been deemed outliers
-  tc.mat <- as.data.frame(tc.mat)
+  #tc.mat <- as.data.frame(tc.mat)
   temp <- temp[temp$type %in% rownames(tc.mat[!is.na(tc.mat[, "st.TCp"]),]),]
   temp$type <- as.factor(as.character(temp$type)) 
   
   fit <- list()
-  class(fit) <- "error"
-  fit[[1]] <- "error"
-  fit$logLik <- 0
+  #class(fit) <- "error"
+  #fit[[1]] <- "error"
+  #fit$logLik <- 0
   if(fit.reci.first){
     parametrisation2 <- "reci"
     
@@ -2931,7 +2931,8 @@ growth.function <- function(data, cut = 0.025,
     }
     
   }
-  if(class(fit)[1] == "error" | !fit.reci.first){
+  #if(class(fit)[1] == "error" | !fit.reci.first){
+  if(is.null(fit) | !fit.reci.first){
     formula <- switch(parametrisation,
                       none =   formula(Bcut ~ N0 * 2^((1/T0 - control/Tcp) * t)),
                       reci =   formula(Bcut ~ N0 * 2^((T0 - control*Tcp) * t)),
@@ -2977,7 +2978,8 @@ growth.function <- function(data, cut = 0.025,
   
   
   
-  if(class(fit)[1] == "error"){
+  #if(class(fit)[1] == "error"){
+  if(is.null(fit)){
     
     start.TCp <- switch(parametrisation,
                         none = - tc.mat[levels(temp$type), "st.TCp"],
@@ -3001,7 +3003,8 @@ growth.function <- function(data, cut = 0.025,
   }
   #id.fits[[id]] <- fit
   
-  if(class(fit)[1] != "error"){
+  #if(class(fit)[1] != "error"){
+  if(!is.null(fit)){
     COEF <- coef(fit)
     
     tc.mat[, "N0"] <- COEF["N0"]
